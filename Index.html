@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Animasi Ketik dan Hapus</title>
+  <style>
+    /* Mengatur tampilan halaman */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: rgb(0, 0, 0);
+      height: 100vh;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      color: white;
+      margin: 0;
+      flex-direction: column; /* Mengatur elemen dalam kolom */
+    }
+
+    /* Mengatur gaya teks animasi */
+    .typing-text {
+      font-size: 34px;
+      font-weight: 600;
+      color: skyblue;
+      border-right: 3px solid rgb(77, 121, 241);
+      white-space: nowrap;
+      overflow: hidden;
+      display: inline-block;
+      animation: blink-cursor 0.75s step-end infinite;
+      margin-bottom: 20px; /* Jarak antara teks dan bendera */
+    }
+
+    /* Mengatur gaya bendera */
+    #flag-container {
+      position: relative;
+      width: 225px;
+      height: 125px;
+      transform: rotate(-15deg);
+      margin-top: 20px;
+    }
+
+    /* Animasi blink kursor */
+    @keyframes blink-cursor {
+      50% {
+        border-color: transparent;
+      }
+    }
+
+    /* Animasi gerak bendera */
+    @keyframes anim {
+      0% {
+        top: 5%;
+      }        
+      100% {
+        top: -5%;
+      }
+    }
+  </style>
+</head>
+<body>
+    
+  <div class="typing-text" id="typing"></div>
+  
+  <div id="flag-container" class="flag on"></div>
+
+  <script>
+    const flag = document.getElementById("flag-container");
+    flag.innerHTML = `
+      <style>
+        #flag-container.on::before {
+            content: "";
+            position: absolute;
+            left: -2%;
+            width: 4px;
+            height: 200%;
+            background: #dcdcdc;
+            border: 0.5px solid #929292;
+            z-index: 2;
+            border-radius: 4px;
+            animation: anim 1s ease-in-out infinite alternate;
+            background-position: 0px 0px;
+            animation-delay: 0ms;
+        }
+        #flag-container span {
+            animation: anim 1s ease-in-out infinite alternate;
+            position: relative;
+            height: 100%;
+            width: 1px;
+            display: inline-block;
+            zoom: 1;
+        }
+        #flag-container span::before, #flag-container span::after {
+            content: "";
+            position: absolute;
+            width: 100%;
+            height: 50%;
+            background: red;
+            border-left: 1px solid transparent;
+        }
+        #flag-container span::after {
+            top: 50%;
+            background: #fff;
+            border-left: 1px solid transparent;
+        }
+      </style>`;
+
+    const w = flag.innerWidth || flag.clientWidth;
+    for (let i = 0; i < w; i++) {
+      let t = document.createElement("span");
+      t.style.backgroundPosition = -i + "px 0";
+      t.style.animationDelay = 10 * i + "ms";
+      flag.appendChild(t);
+    }
+
+    // Daftar kata-kata yang akan ditampilkan
+    const words = [
+      " 10 November 2024 ",
+      " Memperingati ",
+      " Hari Pahlawan Nasional ",
+      " Teladani Pahlawanmu ",
+      " Cintai Negerimu "
+    ];
+
+    let wordIndex = 0; // Indeks kata saat ini
+    let letterIndex = 0; // Indeks huruf saat ini
+    let currentWord = ""; // Kata yang sedang ditampilkan
+    let isDeleting = false; // Apakah sedang menghapus teks atau tidak
+    const typingElement = document.getElementById("typing"); // Elemen HTML untuk teks
+
+    function type() {
+      // Jika dalam mode menghapus, kurangi satu huruf
+      if (isDeleting) {
+        currentWord = words[wordIndex].substring(0, letterIndex--);
+      } else {
+        // Jika dalam mode menambah, tambahkan satu huruf
+        currentWord = words[wordIndex].substring(0, letterIndex++);
+      }
+
+      // Tampilkan teks yang sedang diketik atau dihapus
+      typingElement.textContent = currentWord;
+
+      // Jika selesai menambah huruf dan belum dalam mode menghapus
+      if (!isDeleting && letterIndex === words[wordIndex].length) {
+        isDeleting = true; // Masuk ke mode menghapus
+        setTimeout(type, 1000); // Tunggu sebentar sebelum mulai menghapus
+      }
+      // Jika selesai menghapus huruf
+      else if (isDeleting && letterIndex === 0) {
+        isDeleting = false; // Kembali ke mode menambah huruf
+        wordIndex = (wordIndex + 1) % words.length; // Pindah ke kata berikutnya
+        setTimeout(type, 500); // Tunggu sebentar sebelum mulai menambah huruf
+      } else {
+        // Atur kecepatan mengetik dan menghapus
+        const typingSpeed = isDeleting ? 50 : 100;
+        setTimeout(type, typingSpeed);
+      }
+    }
+
+    // Mulai animasi ketik
+    type();
+  </script>
+
+</body>
+</html>
